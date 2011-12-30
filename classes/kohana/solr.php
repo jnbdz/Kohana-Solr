@@ -14,11 +14,8 @@ class Kohana_SOLR {
 	public static $inputDoc = NULL;
 
 	public static function init() {
-
-		$options = Kohana::$config->load('solr');
-
+		$options = (array)Kohana::$config->load('solr');
 		self::$client = new SolrClient($options);
-
 	}
 
 	public static function q($q, $start = 0, $rows = 50) {
@@ -45,20 +42,30 @@ class Kohana_SOLR {
 		self::inputDoc();
 
 		foreach ($fields as $name=>$value) {
-
-			self::$inputDoc->addField($name, $value); 
-
+			// handle multi value fields
+			if (is_array($value)) 
+			{
+				foreach ($value as $multi) 
+				{
+					self::$inputDoc->addField($name, $multi);
+				}
+			} 
+			else 
+			{
+				self::$inputDoc->addField($name, $value); 
+			}
 		}
 
-		$updateResponse = self::$client->addDocument(self::$inputDoc);
-
-		return $updateResponse->getResponse();
-
-	}
-
-	public static function () {
-
-		
+		try {
+			$updateResponse = self::$client->addDocument(self::$inputDoc, false);
+			$commitResponse = self::$client->commit();
+			return $updateResponse->getResponse();
+		}catch (Exception $e) {
+			echo '<pre>';
+			var_dump( $e->getInternalInfo() );
+			var_dump( $e->getMessage() );
+			die;
+		}
 
 	}
 
