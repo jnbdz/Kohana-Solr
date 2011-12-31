@@ -69,4 +69,14 @@ class Kohana_SOLR {
 
 	}
 
+	public static function removeDoc($ids) {
+		if (is_array($ids)) {
+			self::$client->deleteByIds($ids);
+			self::$client->commit();
+		} else if (!empty($ids)) {
+			self::$client->deleteById($ids);
+			self::$client->commit();
+		}
+	}
+
 }
