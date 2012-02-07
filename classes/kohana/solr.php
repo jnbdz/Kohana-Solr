@@ -24,8 +24,8 @@ class Kohana_SOLR {
 
 		$query = new SolrQuery();
 		$query->setQuery($q);
-		$query->setStart(0);
-		$query->setRows(50);
+		$query->setStart($start);
+		$query->setRows($rows);
 		$query_response = self::$client->query($query);
 		return $query_response->getResponse();
 
